@@ -16,7 +16,7 @@ class UserService {
 
     fun getAllUsers(): List<UserResponse> {
         logger.info("Buscando todos os usuários")
-        return User.findAll().list<User>().map { it.toResponse() }
+        return User.findAll().list().map { it.toResponse() }
     }
 
     fun getUserById(id: String): UserResponse? {
