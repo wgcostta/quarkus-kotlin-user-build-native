@@ -1,6 +1,7 @@
 package com.example.entity
 
 import io.quarkus.mongodb.panache.kotlin.PanacheMongoEntity
+import io.quarkus.mongodb.panache.kotlin.PanacheMongoCompanion
 import io.quarkus.mongodb.panache.common.MongoEntity
 import java.time.LocalDateTime
 
@@ -12,7 +13,7 @@ data class User(
     var createdAt: LocalDateTime = LocalDateTime.now()
 ) : PanacheMongoEntity() {
 
-    companion object : PanacheMongoEntity.Companion<User> {
+    companion object : PanacheMongoCompanion<User> {
         fun findByEmail(email: String): User? = find("email", email).firstResult()
         fun findByNameContaining(name: String): List<User> = find("name like ?1", "%$name%").list()
     }

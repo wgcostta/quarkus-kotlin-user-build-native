@@ -21,7 +21,7 @@ dependencies {
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-arc")
 
-    // MongoDB
+    // MongoDB with Kotlin Panache
     implementation("io.quarkus:quarkus-mongodb-panache-kotlin")
 
     // Validation
@@ -36,14 +36,20 @@ dependencies {
     // Logging
     implementation("io.quarkus:quarkus-logging-json")
 
+    // Config
+    implementation("io.quarkus:quarkus-config-yaml")
+
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // Test dependencies
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
     testImplementation("io.quarkus:quarkus-test-mongodb")
     testImplementation("org.testcontainers:mongodb")
+    testImplementation("org.testcontainers:junit-jupiter")
 }
 
 group = "com.example"
@@ -58,11 +64,13 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_21.toString()
         javaParameters = true
+        freeCompilerArgs = listOf("-Xjsr305=strict")
     }
 }
 
 allOpen {
     annotation("jakarta.ws.rs.Path")
     annotation("jakarta.enterprise.context.ApplicationScoped")
+    annotation("jakarta.persistence.Entity")
     annotation("io.quarkus.test.junit.QuarkusTest")
 }

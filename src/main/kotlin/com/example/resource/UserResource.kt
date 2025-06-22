@@ -12,6 +12,8 @@ import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 
 @Path("/api/users")
@@ -25,7 +27,7 @@ class UserResource {
 
     @GET
     @Operation(summary = "Listar todos os usuários")
-    @ApiResponse(
+    @APIResponse(
         responseCode = "200",
         description = "Lista de usuários",
         content = [Content(schema = Schema(implementation = UserResponse::class))]
@@ -38,8 +40,10 @@ class UserResource {
     @GET
     @Path("/{id}")
     @Operation(summary = "Buscar usuário por ID")
-    @ApiResponse(responseCode = "200", description = "Usuário encontrado")
-    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "Usuário encontrado"),
+        APIResponse(responseCode = "404", description = "Usuário não encontrado")
+    )
     fun getUserById(@PathParam("id") id: String): Response {
         val user = userService.getUserById(id)
         return if (user != null) {
@@ -54,8 +58,10 @@ class UserResource {
     @GET
     @Path("/email/{email}")
     @Operation(summary = "Buscar usuário por email")
-    @ApiResponse(responseCode = "200", description = "Usuário encontrado")
-    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "Usuário encontrado"),
+        APIResponse(responseCode = "404", description = "Usuário não encontrado")
+    )
     fun getUserByEmail(@PathParam("email") email: String): Response {
         val user = userService.getUserByEmail(email)
         return if (user != null) {
@@ -70,7 +76,7 @@ class UserResource {
     @GET
     @Path("/search")
     @Operation(summary = "Pesquisar usuários por nome")
-    @ApiResponse(responseCode = "200", description = "Lista de usuários encontrados")
+    @APIResponse(responseCode = "200", description = "Lista de usuários encontrados")
     fun searchUsers(@QueryParam("name") name: String?): Response {
         if (name.isNullOrBlank()) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -84,9 +90,11 @@ class UserResource {
 
     @POST
     @Operation(summary = "Criar novo usuário")
-    @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso")
-    @ApiResponse(responseCode = "400", description = "Dados inválidos")
-    @ApiResponse(responseCode = "409", description = "Email já está em uso")
+    @APIResponses(
+        APIResponse(responseCode = "201", description = "Usuário criado com sucesso"),
+        APIResponse(responseCode = "400", description = "Dados inválidos"),
+        APIResponse(responseCode = "409", description = "Email já está em uso")
+    )
     fun createUser(@Valid request: CreateUserRequest): Response {
         return try {
             val user = userService.createUser(request)
@@ -101,9 +109,11 @@ class UserResource {
     @PUT
     @Path("/{id}")
     @Operation(summary = "Atualizar usuário")
-    @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso")
-    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
-    @ApiResponse(responseCode = "409", description = "Email já está em uso")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
+        APIResponse(responseCode = "404", description = "Usuário não encontrado"),
+        APIResponse(responseCode = "409", description = "Email já está em uso")
+    )
     fun updateUser(@PathParam("id") id: String, @Valid request: UpdateUserRequest): Response {
         return try {
             val user = userService.updateUser(id, request)
@@ -124,8 +134,10 @@ class UserResource {
     @DELETE
     @Path("/{id}")
     @Operation(summary = "Deletar usuário")
-    @ApiResponse(responseCode = "204", description = "Usuário deletado com sucesso")
-    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    @APIResponses(
+        APIResponse(responseCode = "204", description = "Usuário deletado com sucesso"),
+        APIResponse(responseCode = "404", description = "Usuário não encontrado")
+    )
     fun deleteUser(@PathParam("id") id: String): Response {
         val deleted = userService.deleteUser(id)
         return if (deleted) {
