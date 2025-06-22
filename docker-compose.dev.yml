@@ -1,0 +1,61 @@
+# Docker Compose para desenvolvimento
+# Use: docker-compose -f docker-compose.dev.yml up
+
+services:
+  # MongoDB Database (apenas para desenvolvimento)
+  mongodb-dev:
+    image: mongo:7.0
+    container_name: dev-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: userdb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_dev_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - dev-network
+
+  # Mongo Express (MongoDB Web UI)
+  mongo-express-dev:
+    image: mongo-express:1.0.0
+    container_name: dev-mongo-express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password123
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password123@mongodb-dev:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    ports:
+      - "8081:8081"
+    networks:
+      - dev-network
+    depends_on:
+      - mongodb-dev
+
+  # Redis (para cache em desenvolvimento futuro)
+  redis-dev:
+    image: redis:7.2-alpine
+    container_name: dev-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - dev-network
+    command: redis-server --appendonly yes
+
+volumes:
+  mongodb_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+
+networks:
+  dev-network:
+    driver: bridge
