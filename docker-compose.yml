@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: user-management-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: userdb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - user-management-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # Mongo Express (MongoDB Web UI)
+  mongo-express:
+    image: mongo-express:1.0.0
+    container_name: user-management-mongo-express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password123
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password123@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    ports:
+      - "8081:8081"
+    networks:
+      - user-management-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # Quarkus Application
+  quarkus-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-management-api
+    restart: unless-stopped
+    environment:
+      QUARKUS_MONGODB_CONNECTION_STRING: mongodb://mongodb:27017
+      QUARKUS_MONGODB_DATABASE: userdb
+      QUARKUS_LOG_LEVEL: INFO
+    ports:
+      - "8080:8080"
+    networks:
+      - user-management-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  user-management-network:
+    driver: bridge
