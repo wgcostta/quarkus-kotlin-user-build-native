@@ -12,7 +12,6 @@ import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
-import org.eclipse.microprofile.openapi.annotations.responses.ApiResponse
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 
 @Path("/api/users")

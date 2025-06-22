@@ -2,7 +2,6 @@ package com.example.entity
 
 import io.quarkus.mongodb.panache.kotlin.PanacheMongoEntity
 import io.quarkus.mongodb.panache.common.MongoEntity
-import org.bson.types.ObjectId
 import java.time.LocalDateTime
 
 @MongoEntity(collection = "users")
